@@ -1,16 +1,16 @@
 <template>
   <div id="chain-selector" class="small-container">
+
     <form @submit.prevent="getChains()">
       <input type="text" v-model="symbol.name" placeholder="SPY" maxlength="6" />
-
       <label></label>
       <button>Get Chains</button>
       <label></label>
     </form>
     <br/>
+
     <form @submit.prevent="chart()">
       <select id="expiry-selector"></select>
-
       <label></label>
       <button>Chart</button>
     </form>
@@ -32,7 +32,8 @@ export default {
   methods: {
 
     getChains() {
-      let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}&symbol=${this.symbol.name}&strikeCount=1`
+      var symbol = this.symbol.name.toUpperCase();
+      let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}&symbol=${symbol}&strikeCount=1`
 
       var selectElement = document.getElementById('expiry-selector');
       var i, L = selectElement.options.length - 1;
@@ -62,7 +63,41 @@ export default {
     },
 
     chart() {
+      var expirySelector = document.getElementById("expiry-selector");
+      let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}
+&symbol=${this.symbol.name}&strikeCount=50&toDate=${expirySelector.value}&fromDate=${expirySelector.value}`;
 
+      let putVolumes = [];
+      let callVolumes = [];
+      let strikes = [];
+
+      fetch(tdUrl)
+          .then(res => res.json())
+          .then((data) => {
+
+            const callMap = data.callExpDateMap;
+            const putMap = data.putExpDateMap;
+
+            for (let expDate in callMap) {
+              let strikeMap = callMap[expDate];
+              for (let aStrike in strikeMap) {
+                let call = strikeMap[aStrike][0];
+                callVolumes.push(call.totalVolume);
+                strikes.push(call.strikePrice);
+              }
+            }
+
+            for (let expDate in putMap) {
+              let strikeMap = putMap[expDate];
+              for (let aStrike in strikeMap) {
+                let put = strikeMap[aStrike][0];
+                putVolumes.push(put.totalVolume);
+              }
+            }
+
+            this.$emit('create:chart', strikes, callVolumes, putVolumes);
+          })
+          .catch(console.log)
     }
   }
 }
