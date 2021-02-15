@@ -1,15 +1,15 @@
 <template>
   <div id="chain-selector" class="small-container">
-    <form>
-      <input type="text" placeholder="SPY" maxlength="6" />
+    <form @submit.prevent="getChains()">
+      <input type="text" v-model="symbol.name" placeholder="SPY" maxlength="6" />
 
       <label></label>
       <button>Get Chains</button>
       <label></label>
-
-      <select v-model="expiry">
-        <option value="Expiry Date" disabled hidden>Expiry Date</option>
-      </select>
+    </form>
+    <br/>
+    <form @submit.prevent="chart()">
+      <select id="expiry-selector"></select>
 
       <label></label>
       <button>Chart</button>
@@ -18,24 +18,66 @@
 </template>
 
 <script>
+var CONFIG = require('../config.json');
+
 export default {
   name: 'ChainSelector',
   data() {
     return {
-      expiry: "Expiry Date"
+      symbol: {
+        name: ''
+      }
     }
   },
+  methods: {
+
+    getChains() {
+      let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}&symbol=${this.symbol.name}&strikeCount=1`
+
+      var selectElement = document.getElementById('expiry-selector');
+      var i, L = selectElement.options.length - 1;
+      for(i = L; i >= 0; i--) {
+        selectElement.remove(i);
+      }
+
+      fetch(tdUrl)
+          .then(res => res.json())
+          .then((data) => {
+            let expirationDates = []
+            const callMap = data.callExpDateMap;
+            for (let expDate in callMap) {
+              const date = expDate.split(":")[0]
+              expirationDates.push(date)
+            }
+
+            const selectOptions = document.getElementById("expiry-selector").options;
+            for (let index = 0; index < expirationDates.length; index++) {
+              const option = document.createElement("option");
+              option.value = expirationDates[index];
+              option.innerHTML = expirationDates[index];
+              selectOptions.add(option);
+            }
+          })
+          .catch(console.log)
+    },
+
+    chart() {
+
+    }
+  }
 }
 </script>
 
 <style scoped>
+
 .small-container {
-  width: 570px;
+  width: 300px;
 }
+
 form {
   padding-top: 10px;
   display: flex;
-  width: 550px;
+  width: 300px;
   height: 50px;
 }
 label {
