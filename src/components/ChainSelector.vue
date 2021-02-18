@@ -69,6 +69,8 @@ export default {
 
       let putVolumes = [];
       let callVolumes = [];
+      let putOIs = [];
+      let callOIs = [];
       let strikes = [];
 
       fetch(tdUrl)
@@ -83,6 +85,7 @@ export default {
               for (let aStrike in strikeMap) {
                 let call = strikeMap[aStrike][0];
                 callVolumes.push(call.totalVolume);
+                callOIs.push(call.openInterest);
                 strikes.push(call.strikePrice);
               }
             }
@@ -92,10 +95,11 @@ export default {
               for (let aStrike in strikeMap) {
                 let put = strikeMap[aStrike][0];
                 putVolumes.push(put.totalVolume);
+                putOIs.push(put.openInterest);
               }
             }
 
-            this.$emit('create:chart', strikes, callVolumes, putVolumes);
+            this.$emit('create:chart', strikes, callVolumes, putVolumes, callOIs, putOIs);
           })
           .catch(console.log)
     }

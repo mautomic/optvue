@@ -4,7 +4,8 @@
     <br/>
     <chain-selector @create:chart="createChart"/>
     <br/>
-    <Plotly id='volumePlot' :key="componentKey" :data="data" :layout="layout" :display-mode-bar="false"></Plotly>
+    <Plotly id='volumePlot' :key="volume_componentKey" :data="volume_data" :layout="volume_layout" :display-mode-bar="false"></Plotly>
+    <Plotly id='openInterestPlot' :key="oi_componentKey" :data="oi_data" :layout="oi_layout" :display-mode-bar="false"></Plotly>
   </div>
 </template>
 
@@ -20,24 +21,28 @@ export default {
   },
   data() {
     return {
-      componentKey: 0,
-      data: [
+      volume_componentKey: 0,
+      volume_data: [
           {type: 'bar', x: [], y: [], marker: {color: 'red'}, name: 'Put'},
           {type: 'bar', x: [], y: [], marker: {color: 'green'}, name: 'Call'}
       ],
-      layout: {
-        width: 1500,
-        height: 800,
-        xaxis: {title: "Volume"},
-        yaxis: {title: "Strikes"},
-      }
+      volume_layout: {width: 1400, height: 800, xaxis: {title: "Strikes"}, yaxis: {title: "Volume"}},
+      oi_componentKey: 0,
+      oi_data: [
+        {type: 'bar', x: [], y: [], marker: {color: 'red'}, name: 'Put'},
+        {type: 'bar', x: [], y: [], marker: {color: 'green'}, name: 'Call'}
+      ],
+      oi_layout: {width: 1400, height: 800, xaxis: {title: "Strikes"}, yaxis: {title: "Open Interest"}}
     }
   },
   methods: {
-    createChart(strikes, callVolume, putVolume) {
-      this.data[0] = {type: 'bar', x: strikes, y: putVolume, marker: {color: 'red'}, name: 'Put'};
-      this.data[1] = {type: 'bar', x: strikes, y: callVolume, marker: {color: 'green'}, name: 'Call'};
-      this.componentKey += 1;
+    createChart(strikes, callVolume, putVolume, callOIs, putOIs) {
+      this.volume_data[0] = {type: 'bar', x: strikes, y: putVolume, marker: {color: 'red'}, name: 'Put'};
+      this.volume_data[1] = {type: 'bar', x: strikes, y: callVolume, marker: {color: 'green'}, name: 'Call'};
+      this.volume_componentKey += 1;
+      this.oi_data[0] = {type: 'bar', x: strikes, y: putOIs, marker: {color: 'red'}, name: 'Put'};
+      this.oi_data[1] = {type: 'bar', x: strikes, y: callOIs, marker: {color: 'green'}, name: 'Call'};
+      this.oi_componentKey += 1;
     }
   }
 }
