@@ -12,7 +12,7 @@
     <form @submit.prevent="chart()">
       <select id="expiry-selector"></select>
       <label></label>
-      <button>Chart</button>
+      <button>Chart Options</button>
     </form>
   </div>
 </template>
@@ -110,7 +110,8 @@ export default {
 <style scoped>
 
 .small-container {
-  width: 300px;
+  display: flex;
+  justify-content: center;
 }
 
 form {
@@ -126,16 +127,17 @@ label {
   padding-right: 10px;
 }
 input {
-  width: 100px;
+  width: 120px;
   height: 50px;
   padding-right: 10px;
 }
 select {
-  width: 150px;
+  width: 120px;
   height: 50px;
 }
 button {
   height: 50px;
+  width: 150px;
   padding-left: 20px;
   padding-right: 20px;
 }
