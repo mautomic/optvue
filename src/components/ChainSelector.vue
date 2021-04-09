@@ -63,9 +63,10 @@ export default {
     },
 
     chart() {
+      var symbol = this.symbol.name.toUpperCase();
       var expirySelector = document.getElementById("expiry-selector");
       let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}
-&symbol=${this.symbol.name}&strikeCount=50&toDate=${expirySelector.value}&fromDate=${expirySelector.value}`;
+&symbol=${symbol}&strikeCount=50&toDate=${expirySelector.value}&fromDate=${expirySelector.value}`;
 
       let putVolumes = [];
       let callVolumes = [];
