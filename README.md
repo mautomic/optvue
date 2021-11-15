@@ -16,3 +16,5 @@ Create config.json in the __src__ directory and add your TD Ameritrade API key.
 
 In order to run this web app, you must first have an API key. This requires both an account with the
 [TDAmeritrade](https://www.tdameritrade.com/home.page), and an account setup on the [developer page](https://developer.tdameritrade.com).
+
+To kick off the app, run `npm run serve` in the base directory.
