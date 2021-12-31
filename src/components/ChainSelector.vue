@@ -1,19 +1,29 @@
 <template>
-  <div id="chain-selector" class="small-container">
+  <div id="chain-selector" class="medium-container">
 
     <form @submit.prevent="getChains()">
-      <input type="text" v-model="symbol.name" placeholder="SPY" maxlength="6" />
+      <input type="text" v-model="symbol" placeholder="SPY" maxlength="6" />
       <label></label>
       <button>Get Chains</button>
       <label></label>
     </form>
-    <br/>
 
     <form @submit.prevent="chart()">
       <select id="expiry-selector"></select>
       <label></label>
       <button>Chart Options</button>
     </form>
+
+    <small_form>
+      <select id="strike-count-selector" v-model="strikeCount">
+        <option>Strike Count</option>
+        <option>10</option>
+        <option>30</option>
+        <option>50</option>
+        <option>100</option>
+      </select>
+      <label></label>
+    </small_form>
   </div>
 </template>
 
@@ -24,15 +34,14 @@ export default {
   name: 'ChainSelector',
   data() {
     return {
-      symbol: {
-        name: ''
-      }
+      symbol: '',
+      strikeCount: 'Strike Count',
     }
   },
   methods: {
 
     getChains() {
-      var symbol = this.symbol.name.toUpperCase();
+      var symbol = this.symbol.toUpperCase();
       let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}&symbol=${symbol}&strikeCount=1`
 
       var selectElement = document.getElementById('expiry-selector');
@@ -63,10 +72,15 @@ export default {
     },
 
     chart() {
-      var symbol = this.symbol.name.toUpperCase();
+      var symbol = this.symbol.toUpperCase();
       var expirySelector = document.getElementById("expiry-selector");
+      var chainCountSelector = document.getElementById("strike-count-selector");
+      let strikeCount = 50;
+      if(chainCountSelector.value !== 'Strike Count') {
+        strikeCount = chainCountSelector.value;
+      }
       let tdUrl = `https://api.tdameritrade.com/v1/marketdata/chains?apikey=${CONFIG.apiKey}
-&symbol=${symbol}&strikeCount=50&toDate=${expirySelector.value}&fromDate=${expirySelector.value}`;
+&symbol=${symbol}&strikeCount=${strikeCount}&toDate=${expirySelector.value}&fromDate=${expirySelector.value}`;
 
       let putVolumes = [];
       let callVolumes = [];
@@ -110,7 +124,7 @@ export default {
 
 <style scoped>
 
-.small-container {
+.medium-container {
   display: flex;
   justify-content: center;
 }
@@ -118,9 +132,17 @@ export default {
 form {
   padding-top: 10px;
   display: flex;
-  width: 300px;
+  width: 320px;
   height: 50px;
 }
+
+small_form {
+  padding-top: 10px;
+  display: flex;
+  width: 160px;
+  height: 50px;
+}
+
 label {
   font-size: 17px;
   height: 30px;
@@ -133,7 +155,7 @@ input {
   padding-right: 10px;
 }
 select {
-  width: 120px;
+  width: 130px;
   height: 50px;
 }
 button {
