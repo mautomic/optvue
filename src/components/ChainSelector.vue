@@ -75,7 +75,7 @@ export default {
       var symbol = this.symbol.toUpperCase();
       var expirySelector = document.getElementById("expiry-selector");
       var chainCountSelector = document.getElementById("strike-count-selector");
-      let strikeCount = 50;
+      let strikeCount = 30;
       if(chainCountSelector.value !== 'Strike Count') {
         strikeCount = chainCountSelector.value;
       }
@@ -87,6 +87,9 @@ export default {
       let putOIs = [];
       let callOIs = [];
       let strikes = [];
+      let callGammaExposures = new Map();
+      let putGammaExposures = new Map();
+      let SPY = 427.92;
 
       fetch(tdUrl)
           .then(res => res.json())
@@ -96,25 +99,48 @@ export default {
             const putMap = data.putExpDateMap;
 
             for (let expDate in callMap) {
-              let strikeMap = callMap[expDate];
-              for (let aStrike in strikeMap) {
-                let call = strikeMap[aStrike][0];
+              let callStrikeMap = callMap[expDate];
+              for (let aStrike in callStrikeMap) {
+                let call = callStrikeMap[aStrike][0];
                 callVolumes.push(call.totalVolume);
                 callOIs.push(call.openInterest);
                 strikes.push(call.strikePrice);
+                let callGamma = call.openInterest * call.gamma * 100 * SPY * SPY * .01;
+                callGammaExposures.set(call.strikePrice, callGamma);
               }
-            }
 
-            for (let expDate in putMap) {
-              let strikeMap = putMap[expDate];
-              for (let aStrike in strikeMap) {
-                let put = strikeMap[aStrike][0];
+              let putStrikeMap = putMap[expDate];
+              for (let aStrike in putStrikeMap) {
+                let put = putStrikeMap[aStrike][0];
                 putVolumes.push(put.totalVolume);
                 putOIs.push(put.openInterest);
+                let putGamma = put.openInterest * put.gamma * 100 * SPY * SPY * -.01;
+                putGammaExposures.set(put.strikePrice, putGamma);
               }
             }
 
-            this.$emit('create:chart', strikes, callVolumes, putVolumes, callOIs, putOIs);
+            let gammaExposures = [];
+            for (let strike of strikes) {
+              let callGamma = 0;
+              if (callGammaExposures.has(strike)) {
+                callGamma = callGammaExposures.get(strike);
+              } else {
+                continue;
+              }
+
+              let putGamma = 0;
+              if (putGammaExposures.has(strike)) {
+                putGamma = putGammaExposures.get(strike);
+              } else {
+                continue;
+              }
+              let gammaExposure = callGamma + putGamma;
+              console.log(strike);
+              console.log(gammaExposure);
+              gammaExposures.push(gammaExposure);
+            }
+
+            this.$emit('create:chart', strikes, callVolumes, putVolumes, callOIs, putOIs, gammaExposures);
           })
           .catch(console.log)
     }

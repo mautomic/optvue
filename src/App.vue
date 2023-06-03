@@ -6,6 +6,7 @@
     <br/>
     <Plotly id='volumePlot' :key="volume_componentKey" :data="volume_data" :layout="volume_layout" :display-mode-bar="false"></Plotly>
     <Plotly id='openInterestPlot' :key="oi_componentKey" :data="oi_data" :layout="oi_layout" :display-mode-bar="false"></Plotly>
+    <Plotly id='gammaPlot' :key="gamma_componentKey" :data="gamma_data" :layout="gamma_layout" :display-mode-bar="false"></Plotly>
   </div>
 </template>
 
@@ -32,17 +33,24 @@ export default {
         {type: 'bar', x: [], y: [], marker: {color: 'red'}, name: 'Put'},
         {type: 'bar', x: [], y: [], marker: {color: 'green'}, name: 'Call'}
       ],
-      oi_layout: {width: 1400, height: 800, xaxis: {title: "Strikes"}, yaxis: {title: "Open Interest"}}
+      oi_layout: {width: 1400, height: 800, xaxis: {title: "Strikes"}, yaxis: {title: "Open Interest"}},
+      gamma_componentKey: 0,
+      gamma_data: [
+        {type: 'bar', x: [], y: [], marker: {color: 'blue'}, name: 'Put'},
+      ],
+      gamma_layout: {width: 1400, height: 800, xaxis: {title: "Strikes"}, yaxis: {title: "Gamma"}},
     }
   },
   methods: {
-    createChart(strikes, callVolume, putVolume, callOIs, putOIs) {
+    createChart(strikes, callVolume, putVolume, callOIs, putOIs, gammaExposures) {
       this.volume_data[0] = {type: 'bar', x: strikes, y: putVolume, marker: {color: 'red'}, name: 'Put'};
       this.volume_data[1] = {type: 'bar', x: strikes, y: callVolume, marker: {color: 'green'}, name: 'Call'};
       this.volume_componentKey += 1;
       this.oi_data[0] = {type: 'bar', x: strikes, y: putOIs, marker: {color: 'red'}, name: 'Put'};
       this.oi_data[1] = {type: 'bar', x: strikes, y: callOIs, marker: {color: 'green'}, name: 'Call'};
       this.oi_componentKey += 1;
+      this.gamma_data[0] = {type: 'bar', x: strikes, y: gammaExposures, marker: {color: 'blue'}, name: 'Gamma'};
+      this.gamma_componentKey += 1;
     }
   }
 }
